@@ -11,7 +11,9 @@ import {
   ArcRotateCamera,
   Tools,
   DynamicTexture,
-  PBRMaterial
+  PBRMaterial,
+  Texture,
+  HemisphericLight,
 } from '@babylonjs/core'
 import SceneComponent from 'babylonjs-hook'
 import '@babylonjs/loaders'
@@ -47,55 +49,84 @@ const initScene = async (scene: Scene) => {
     canvas.height = window.innerHeight
   }
 
-  camera = new ArcRotateCamera( 'Camera', (3 * Math.PI) / 2, Math.PI / 2.5, 5, new Vector3(25, 20, 0), scene)
+  camera = new ArcRotateCamera(
+    'Camera',
+    (3 * Math.PI) / 2,
+    Math.PI / 2.5,
+    5,
+    new Vector3(25, 20, 0),
+    scene
+  )
+  new HemisphericLight('light', new Vector3(0, 1, 0), scene)
+  new HemisphericLight('light', new Vector3(0, -1, 0), scene)
 
   // camera.attachControl(canvas, true)
 
   MeshBuilder.CreateLines('lines', { points: points }, scene)
   MeshBuilder.CreateLines('lines', { points: [points[7], points[0]] }, scene)
 
-
   const obj = await loadObject('assets/', 'scene.glb', scene)
 
   character_mesh = obj[0]
   character_texture_mesh = obj[1]
 
-  const mat1 = new PBRMaterial('mat-test-2', scene)
-  mat1.emissiveColor = new Color3(1, 0.1, 0.1)
-  mat1.metallic = 0.0
-  mat1.roughness = 0    
-  mat1.subSurface.isRefractionEnabled = true
-
   // character_mesh.position.y = 0
+
+  const mat1 = new PBRMaterial('mat-test-2', scene)
+  // mat1.diffuseTexture = new Texture('assets/criminalMaleA.png', scene)
+  mat1.albedoColor = new Color3(0.9, 0, 0)
+  mat1.roughness = .5
+  mat1.metallic = .2
+
+
+  // mat1.diffuseColor = new Color3(0.9, 0, 0)
   character_texture_mesh.material = mat1
+  console.log(character_texture_mesh)
 
   // const idle_animation: AnimationGroup | null = scene.getAnimationGroupByName('Root|mixamo.com|Layer0.001')
-  const run_animation: AnimationGroup | null = scene.getAnimationGroupByName('Root|mixamo.com|Layer0.001.001')
+  const run_animation: AnimationGroup | null = scene.getAnimationGroupByName(
+    'Root|mixamo.com|Layer0.001.001'
+  )
   if (run_animation) {
     run_animation.start(true, 1.0, run_animation.from, run_animation.to, false)
   }
 
   for (let i in points) {
-    const point = MeshBuilder.CreateCylinder( 'point', { diameter: 5, height: 0.4, hasRings: true }, scene)
-    const p2 = MeshBuilder.CreateCylinder( 'point', { diameter: 4.2, height: 0.41 }, scene)
+    const index = parseInt(i)
+    const point = MeshBuilder.CreateCylinder(
+      'point',
+      { diameter: 5, height: 0.4, hasRings: true },
+      scene
+    )
+    const p2 = MeshBuilder.CreateCylinder(
+      'point',
+      { diameter: 4.2, height: 0.41 },
+      scene
+    )
     point.addChild(p2)
-    point.position = points[i]
+    point.position = points[index]
 
-    const textureGround = new DynamicTexture( 'dynamic texture', { width: 256, height: 256 }, scene, false)
-    const materialGround = new StandardMaterial('Mat', scene)
-    materialGround.diffuseTexture = textureGround
-    materialGround.emissiveColor = Color3.White()
-    p2.material = materialGround
+    const prev = index == 0 ? nbPoints - 1 : index - 1
+    point.lookAt(points[prev])
+    point.rotate(new Vector3(0, 1, 0), Math.PI)
 
+    const material_background = new StandardMaterial('Mat', scene)
+    material_background.diffuseColor = Color3.Black()
+    point.material = material_background
+
+    const text_texture = new DynamicTexture( 'dynamic texture', { width: 256, height: 256 }, scene, false)
+    const material_text = new StandardMaterial('Mat', scene)
+    material_text.diffuseTexture = text_texture
+    p2.material = material_text
     const font = 'bold 120px monospace'
-    var textureContext = textureGround.getContext()
+    const textureContext = text_texture.getContext()
     textureContext.textAlign = 'center'
-    const text = (+i + 1).toString()
+    const text = (index + 1).toString()
     const posX = 256 / 2
     const posY = (256 + 70) / 2
 
-    textureGround.drawText(text, posX, posY, font, 'black', 'white', true, true)
-    textureGround.update()
+    text_texture.drawText(text, posX, posY, font, 'black', 'white', true, true)
+    text_texture.update()
   }
 }
 
@@ -117,12 +148,10 @@ const onRender = (scene: Scene) => {
   position.y = points[current].y + (points[next].y - points[current].y) * diff
   position.z = points[current].z + (points[next].z - points[current].z) * diff
   character_mesh.position = position
-  character_texture_mesh.position = position
 
   currentPoint = currentPoint + s * 0.001
 
   if (currentPoint >= nbPoints) currentPoint = 0
-  
 
   character_mesh.lookAt(points[next])
   character_mesh.rotate(new Vector3(0, 1, 0), Tools.ToRadians(180))
@@ -131,22 +160,21 @@ const onRender = (scene: Scene) => {
   const marge = [20, 40]
 
   const newPos = camera.position.clone()
-  if(camera.position.x > character_mesh.position.x + marge[1]) {
+  if (camera.position.x > character_mesh.position.x + marge[1]) {
     newPos.x = character_mesh.position.x + marge[1]
-  } 
+  }
 
-  if(camera.position.z > character_mesh.position.z + marge[1]) {
+  if (camera.position.z > character_mesh.position.z + marge[1]) {
     newPos.z = character_mesh.position.z + marge[1]
   }
 
-  if (camera.position.x < character_mesh.position.x +marge[0]) {
+  if (camera.position.x < character_mesh.position.x + marge[0]) {
     newPos.x = character_mesh.position.x + marge[0]
   }
-  if (camera.position.x < character_mesh.position.z +marge[0]) {
+  if (camera.position.x < character_mesh.position.z + marge[0]) {
     newPos.z = character_mesh.position.z + marge[0]
   }
   camera.position = newPos
-
 }
 
 function App() {
