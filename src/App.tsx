@@ -14,6 +14,7 @@ import {
   PBRMaterial,
   Texture,
   HemisphericLight,
+  Material
 } from '@babylonjs/core'
 import SceneComponent from 'babylonjs-hook'
 import '@babylonjs/loaders'
@@ -72,21 +73,22 @@ const initScene = async (scene: Scene) => {
 
   // character_mesh.position.y = 0
 
-  const mat1 = new PBRMaterial('mat-test-2', scene)
-  // mat1.diffuseTexture = new Texture('assets/criminalMaleA.png', scene)
-  mat1.albedoColor = new Color3(0.9, 0, 0)
-  mat1.roughness = .5
-  mat1.metallic = .2
+  // const mat1 = new PBRMaterial('mat-test-2', scene)
+  // mat1.albedoColor = new Color3(0.9, 0, 0)
+  // mat1.roughness = .5
+  // mat1.metallic = .2
+  const mat1 = new StandardMaterial('mat-test-2', scene)
+  mat1.diffuseColor = new Color3(1, 1, 1)
+  mat1.ambientTexture = new Texture('assets/criminalMaleA.png', scene)
+  // character_texture_mesh.overrideMaterialSideOrientation = Material.CounterClockWiseSideOrientation
 
 
   // mat1.diffuseColor = new Color3(0.9, 0, 0)
   character_texture_mesh.material = mat1
   console.log(character_texture_mesh)
 
-  // const idle_animation: AnimationGroup | null = scene.getAnimationGroupByName('Root|mixamo.com|Layer0.001')
-  const run_animation: AnimationGroup | null = scene.getAnimationGroupByName(
-    'Root|mixamo.com|Layer0.001.001'
-  )
+  // const idle_animation: AnimationGroup | null = scene.getAnimationGroupByName('idle')
+  const run_animation: AnimationGroup | null = scene.getAnimationGroupByName('run')
   if (run_animation) {
     run_animation.start(true, 1.0, run_animation.from, run_animation.to, false)
   }
