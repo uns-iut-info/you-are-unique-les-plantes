@@ -138,20 +138,23 @@ let nbPoints = points.length
 const onRender = (scene: Scene) => {
   if (!character_mesh) return
 
-  const deltaTimeInMillis = scene.getEngine().getDeltaTime()
-  const s = speed * deltaTimeInMillis
+
 
   const current = Math.floor(currentPoint)
   const next = current == nbPoints - 1 ? 0 : current + 1
   const diff = currentPoint - current
   const position = Vector3.Zero()
+  const distance = Math.sqrt(Math.pow(points[current].x - points[next].x, 2) + Math.pow(points[current].z - points[next].z, 2))
+  const deltaTimeInMillis = scene.getEngine().getDeltaTime()
+  const velocity = speed * deltaTimeInMillis / distance / 30
+  
 
   position.x = points[current].x + (points[next].x - points[current].x) * diff
   position.y = points[current].y + (points[next].y - points[current].y) * diff
   position.z = points[current].z + (points[next].z - points[current].z) * diff
   character_mesh.position = position
 
-  currentPoint = currentPoint + s * 0.001
+  currentPoint = currentPoint + velocity
 
   if (currentPoint >= nbPoints) currentPoint = 0
 
