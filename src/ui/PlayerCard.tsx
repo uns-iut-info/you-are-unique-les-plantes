@@ -224,7 +224,6 @@ export default function PlayerCard({
         </div>
       </div>
       <button
-        onClick={() => setReady(true)}
         className={`${ready ? 'ready' : ''}`}
       >
         <div><span>X</span> En attente</div>
