@@ -1,0 +1,239 @@
+.player {
+  width: 220px;
+  position: relative;
+
+  color: white;
+
+  & > div {
+    border-radius: 16px 16px 0 0;
+    padding: 16px;
+    background-image: url('https://www.transparenttextures.com/patterns/gplay.png');
+    background-size: 150px;
+  
+    &.red {
+      border-color: red;
+      background-color: red;
+      
+    }
+  
+    &.blue {
+      border-color: blue;
+      background-color: blue;
+    }
+  
+    &.green {
+      border-color: green;
+      background-color: green;
+    }
+    &.purple {
+      border-color: purple;
+      background-color: purple;
+    }
+  }
+  svg path {
+    stroke: white;
+  }
+
+  
+
+  h2 {
+    margin: 0;
+    text-align: center;
+    margin-bottom: 16px;
+  }
+
+  .hand {
+    position: absolute;
+    top: 16px;
+    right: -20px;
+    animation: breath ease-in-out 2s infinite;
+    transition: all 0.1s ease-in-out;
+  }
+
+  
+
+  .line {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  &.shaking {
+    animation: shake 0.05s ease-in-out infinite;
+  }
+  @keyframes shake {
+    0% {
+      transform: translate(0, 0);
+    }
+    25% {
+      transform: translate(-2px, -2px);
+    }
+    50% {
+      transform: translate(2px, 2px);
+    }
+    75% {
+      transform: translate(-2px, 2px);
+    }
+    100% {
+      transform: translate(0, 0);
+    }
+  }
+
+  .player-luck-bar,
+  .player-strength-bar {
+    height: 8px;
+    width: 100%;
+    border-radius: 4px;
+    background-color: rgba(0, 0, 0, 0.2);
+    margin-bottom: 16px;
+
+    .player-luck-bar-value,
+    .player-strength-bar-value {
+      background-color: rgba(255, 255, 255, 0.7);
+      height: inherit;
+      border-radius: 4px;
+    }
+  }
+
+  .player-color {
+    padding: 0 2px;
+    margin-bottom: 8px;
+
+    .color {
+      height: 24px;
+      width: 24px;
+      border-radius: 99px;
+      border: 2px solid white;
+
+      &.red {
+        background-color: red;
+      }
+      &.green {
+        background-color: green;
+      }
+      &.blue {
+        background-color: blue;
+      }
+      &.purple {
+        background-color: purple;
+      }
+    }
+  }
+
+  button {
+    width: 100%;
+    padding: 12px 0;
+    text-transform: uppercase;
+    border-radius: 0 0 16px 16px;
+    border: none;
+    background: rgba(black, .5);
+    color: white;
+    font-size: 24px;
+    animation: breath-2 ease-in-out 2s infinite;
+    display: flex;
+    overflow: hidden;
+
+    transition: background-color .1s ease-in-out;
+
+
+    & > div {
+      flex: none;
+      width: 100%;
+      display: flex;
+      justify-content: center;
+      transition: transform .3s ease-in-out;
+
+      &:first-child {
+        transform: translateX(0);
+      }
+  
+      &:last-child {
+        color: black;
+        transform: translateX(0);
+      }
+    }
+    
+
+    svg {
+      height: 22px;
+      width: 20px;
+      margin-right: 8px;
+    }
+
+    .excl {
+      display: block;
+      margin-left: 8px;
+    }
+
+    &.ready {
+      background: white;
+      
+      animation: bounce ease-in-out .3s;
+
+      & > div:first-child {
+        transform: translateX(-100%);
+      }
+  
+      & > div:last-child {
+        transform: translateX(-100%);
+      }
+    }
+
+
+  }
+
+  @keyframes breath {
+    0% {
+      transform: scale(1);
+    }
+    50% {
+      transform: scale(1.05);
+    }
+    100% {
+      transform: scale(1);
+    }
+  }
+
+  @keyframes breath-2 {
+    0% {
+      transform: translateY(2px)
+    }
+    50% {
+      transform: translateY(5px)
+    }
+    100% {
+      transform: translateY(2px)
+    }
+  }
+
+  @keyframes bounce {
+    0% {
+      transform: translateY(0)
+    }
+    50% {
+      transform: translateY(-10px)
+    }
+    100% {
+      transform: translateY(0)
+    }
+  }
+
+  @keyframes arrive {
+    0% {
+      transform: translateY(-50px);
+      width: 0px;
+    }
+    100% {
+      transform: translateY(0);
+      width: 20px;
+    }
+  }
+  @keyframes arrive-2 {
+    0% {
+      transform: translateX(100px);
+    }
+    100% {
+      transform: translateY(0);
+    }
+  }
+}

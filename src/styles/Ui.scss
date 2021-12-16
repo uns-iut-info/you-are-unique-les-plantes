@@ -1,0 +1,17 @@
+.Ui {
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  color: white;
+  position: absolute;
+  inset: 0;
+  padding: 32px;
+}
+
+.players {
+  display: flex;
+  gap: 64px;
+  margin-top: 280px;
+
+}
