@@ -18,7 +18,12 @@ import {
 import '@babylonjs/loaders'
 import { loadObject } from '../utils'
 
+let players: Mesh[]
+let _scene: Scene
+
+
 export const initScene = async (scene: Scene) => {
+  _scene = scene
   scene.clearColor = new Color4(0.5, 0.5, 1)
 
   const canvas = scene.getEngine().getRenderingCanvas()
@@ -51,7 +56,7 @@ export const initScene = async (scene: Scene) => {
     obj4[0],
   ]
 
-  let character_texture_meshes = [
+  players = [
     obj1[1],
     obj2[1],
     obj3[1],
@@ -64,13 +69,12 @@ export const initScene = async (scene: Scene) => {
     character_pos += 6
   }
 
-  const colors = [new Color3(0.9, 0, 0), new Color3(0, 0.9, 0), new Color3(0, 0, .9), new Color3(0.45, 0, .45)]
-  for(let i in character_texture_meshes) {
+  for(let i in players) {
     const mat = new PBRMaterial('mat-test-2', scene)
-    mat.albedoColor = colors[i]
+    mat.albedoColor = new Color3(.3, .3, .3)
     mat.roughness = .5
     mat.metallic = .2
-    character_texture_meshes[i].material = mat
+    players[i].material = mat
   }
 
   const idle_animation: AnimationGroup | null = scene.getAnimationGroupByName('idle')
@@ -98,8 +102,16 @@ export const onRender = (scene: Scene) => {
 
 }
 
+export function setPlayerColor(player: number, color: Color3) {
+  const mat = new PBRMaterial('mat-test-2', _scene)
+    mat.albedoColor = color
+    mat.roughness = .5
+    mat.metallic = .2
+    players[player].material = mat
+}
 
 export default {
   initScene,
-  onRender
+  onRender,
+  setPlayerColor
 }

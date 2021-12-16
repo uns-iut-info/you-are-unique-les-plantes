@@ -9,32 +9,52 @@
     padding: 16px;
     background-image: url('https://www.transparenttextures.com/patterns/gplay.png');
     background-size: 150px;
-  
+
     &.red {
-      border-color: red;
       background-color: red;
-      
     }
-  
+
     &.blue {
-      border-color: blue;
       background-color: blue;
     }
-  
+
     &.green {
-      border-color: green;
       background-color: green;
     }
     &.purple {
-      border-color: purple;
       background-color: purple;
+    }
+
+    &.waiting {
+      opacity: 0.8;
+      background-color: #333;
+    }
+
+    &.shaking {
+      animation: shake 0.05s ease-in-out infinite;
+    }
+    
+    @keyframes shake {
+      0% {
+        transform: translate(0, 0);
+      }
+      25% {
+        transform: translate(-2px, -2px);
+      }
+      50% {
+        transform: translate(2px, 2px);
+      }
+      75% {
+        transform: translate(-2px, 2px);
+      }
+      100% {
+        transform: translate(0, 0);
+      }
     }
   }
   svg path {
     stroke: white;
   }
-
-  
 
   h2 {
     margin: 0;
@@ -50,33 +70,10 @@
     transition: all 0.1s ease-in-out;
   }
 
-  
-
   .line {
     display: flex;
     justify-content: space-between;
     align-items: center;
-  }
-
-  &.shaking {
-    animation: shake 0.05s ease-in-out infinite;
-  }
-  @keyframes shake {
-    0% {
-      transform: translate(0, 0);
-    }
-    25% {
-      transform: translate(-2px, -2px);
-    }
-    50% {
-      transform: translate(2px, 2px);
-    }
-    75% {
-      transform: translate(-2px, 2px);
-    }
-    100% {
-      transform: translate(0, 0);
-    }
   }
 
   .player-luck-bar,
@@ -126,33 +123,46 @@
     text-transform: uppercase;
     border-radius: 0 0 16px 16px;
     border: none;
-    background: rgba(black, .5);
+    background: rgba(black, 0.5);
     color: white;
     font-size: 24px;
     animation: breath-2 ease-in-out 2s infinite;
     display: flex;
     overflow: hidden;
 
-    transition: background-color .1s ease-in-out;
-
+    transition: background-color 0.1s ease-in-out;
 
     & > div {
       flex: none;
       width: 100%;
       display: flex;
       justify-content: center;
-      transition: transform .3s ease-in-out;
+      transition: transform 0.3s ease-in-out;
+
+      height: 30px;
+      display: flex;
+      align-items: center;
 
       &:first-child {
         transform: translateX(0);
+        
+        span {
+          margin-right: 8px;
+          border: 3px solid white;
+          border-radius: 99px;
+          width: 30px;
+          height: 30px;
+          font-size: 20px;
+          display: grid;
+          place-items: center;
+        }
       }
-  
+
       &:last-child {
         color: black;
         transform: translateX(0);
       }
     }
-    
 
     svg {
       height: 22px;
@@ -167,19 +177,17 @@
 
     &.ready {
       background: white;
-      
-      animation: bounce ease-in-out .3s;
+
+      animation: bounce ease-in-out 0.3s;
 
       & > div:first-child {
         transform: translateX(-100%);
       }
-  
+
       & > div:last-child {
         transform: translateX(-100%);
       }
     }
-
-
   }
 
   @keyframes breath {
@@ -196,25 +204,25 @@
 
   @keyframes breath-2 {
     0% {
-      transform: translateY(2px)
+      transform: translateY(2px);
     }
     50% {
-      transform: translateY(5px)
+      transform: translateY(5px);
     }
     100% {
-      transform: translateY(2px)
+      transform: translateY(2px);
     }
   }
 
   @keyframes bounce {
     0% {
-      transform: translateY(0)
+      transform: translateY(0);
     }
     50% {
-      transform: translateY(-10px)
+      transform: translateY(-10px);
     }
     100% {
-      transform: translateY(0)
+      transform: translateY(0);
     }
   }
 

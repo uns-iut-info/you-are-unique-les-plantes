@@ -1,29 +1,40 @@
 import { useEffect, useState } from 'react'
 import { AddSquare, MinusSquare } from 'iconsax-react'
-import '../styles/Player.scss'
+import '../styles/PlayerCard.scss'
+import { setPlayerColor } from '../3d/SelectScene'
+import { Color3 } from '@babylonjs/core'
 
 const MOUSE_POSES: { [key: string]: { x: number; y: number } } = {
-  '0-0': { x: 45, y: 75 },
-  '0-1': { x: 87, y: 75 },
-  '0-2': { x: 129, y: 75 },
-  '0-3': { x: 170, y: 75 },
+  '0-0': { x: 30, y: 70 },
+  '0-1': { x: 83, y: 70 },
+  '0-2': { x: 137, y: 70 },
+  '0-3': { x: 190, y: 70 },
 
-  '1-0': { x: 52, y: 124 },
-  '1-1': { x: 172, y: 124 },
+  '1-0': { x: 35, y: 120 },
+  '1-1': { x: 190, y: 120 },
 
-  '2-0': { x: 52, y: 206 },
-  '2-1': { x: 172, y: 206 },
+  '2-0': { x: 35, y: 200 },
+  '2-1': { x: 190, y: 200 },
+}
+
+const colors : { [key: string]: Color3 } = {
+  red: new Color3(1, 0, 0),
+  green: new Color3(0, 1, 0),
+  blue: new Color3(0, 0, 1),
+  purple: new Color3(.45, 0, .45),
 }
 
 type PlayerProps = {
-  controls?: boolean
   name: string
   color: string
+  connected: boolean
+  gamepad?: any
 }
-export default function Player({
-  controls,
+export default function PlayerCard({
   name: player_name,
   color: player_color,
+  connected,
+  gamepad,
 }: PlayerProps) {
   // Player state
   const [name, setName] = useState(player_name)
@@ -31,53 +42,72 @@ export default function Player({
   const [strength, setStrength] = useState(0.5)
   const [color, setColor] = useState(player_color)
   const [ready, setReady] = useState(false)
+  const [action, setAction] = useState('none')
 
   // Card state
   const [shaking, setShaking] = useState(false)
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 })
 
   useEffect(() => {
-    if (!controls) return
-    window.addEventListener('keydown', handleKeyDown)
-    return () => {
-      window.removeEventListener('keydown', handleKeyDown)
-    }
-  }, [mousePos, luck, strength])
-
-  useEffect(() => {
     if (shaking) setTimeout(() => setShaking(false), 200)
   }, [shaking])
 
-  function handleKeyDown(e: KeyboardEvent) {
-    e.preventDefault()
-    if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(e.key)) {
-      handleMousePos(e)
+  useEffect(() => {
+    if (connected) {
+      const obs = gamepad.onButtonDownObservable.add((button: any) => {
+        if (ready) {
+          if (button === 1) setReady(false)
+        } else {
+          if (button === 0) handleEnter()
+          if (button === 2) setReady(true)
+        }
+      })
+      gamepad.onleftstickchanged((values: any) => {
+        if (ready) return
+        let mouvement
+        if (values.x < -0.5) mouvement = 'left'
+        else if (values.x > 0.5) mouvement = 'right'
+        else if (values.y < -0.5) mouvement = 'up'
+        else if (values.y > 0.5) mouvement = 'down'
+        else mouvement = 'none'
+        setAction(mouvement)
+      })
+
+      return () => {
+        gamepad.onButtonDownObservable.remove(obs)
+      }
+    } else {
+      reset()
     }
+  }, [connected, mousePos, luck, strength, ready])
 
-    if (e.key === 'Enter') handleEnter()
-  }
+  useEffect(() => {
+    if (gamepad) {
+      setPlayerColor(gamepad.index, colors[color])
+    }
+  }, [gamepad, color])
 
-  function handleMousePos(e: KeyboardEvent) {
+  useEffect(() => {
     let new_x
     let new_y
-    switch (e.key) {
-      case 'ArrowUp':
+    switch (action) {
+      case 'up':
         new_y = mousePos.y - 1
         new_x = mousePos.x
         if (new_y == 0) new_x = mousePos.x == 0 ? 0 : 3
         if (new_y >= 0) setMousePos({ x: new_x, y: new_y })
         break
-      case 'ArrowDown':
+      case 'down':
         new_y = mousePos.y + 1
         new_x = mousePos.x
         if (mousePos.y == 0) new_x = mousePos.x < 2 ? 0 : 1
         if (new_y < 3) setMousePos({ x: new_x, y: new_y })
         break
-      case 'ArrowLeft':
+      case 'left':
         new_x = mousePos.x - 1
         if (new_x >= 0) setMousePos({ x: new_x, y: mousePos.y })
         break
-      case 'ArrowRight':
+      case 'right':
         new_x = mousePos.x + 1
         if (mousePos.y == 0) {
           if (new_x < 4) setMousePos({ x: new_x, y: mousePos.y })
@@ -86,7 +116,7 @@ export default function Player({
         }
         break
     }
-  }
+  }, [action])
 
   function handleEnter() {
     const INC = 0.25
@@ -133,10 +163,22 @@ export default function Player({
     }
   }
 
+  function reset() {
+    setName(player_name)
+    setLuck(0.5)
+    setStrength(0.5)
+    setColor(player_color)
+    setReady(false)
+    setAction('none')
+  }
   return (
     <div className="player">
-      <div className={`${color} ${shaking ? 'shaking' : ''}`}>
-        {controls && (
+      <div
+        className={`${!connected ? 'waiting' : ''} ${color} ${
+          shaking ? 'shaking' : ''
+        }`}
+      >
+        {!ready && connected && (
           <img
             className="hand"
             src="hand.png"
@@ -185,9 +227,7 @@ export default function Player({
         onClick={() => setReady(true)}
         className={`${ready ? 'ready' : ''}`}
       >
-        <div>
-          En attente
-        </div>
+        <div><span>X</span> En attente</div>
         <div>
           <RunIcon />
           <span>Prêt</span>
