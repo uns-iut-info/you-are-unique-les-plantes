@@ -1,8 +1,8 @@
 .player {
   width: 220px;
-  position: relative;
-
+  position: absolute;
   color: white;
+  transform: translateX(-50%);
 
   & > div {
     border-radius: 16px 16px 0 0;

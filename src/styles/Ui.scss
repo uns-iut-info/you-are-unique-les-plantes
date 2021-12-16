@@ -7,6 +7,12 @@
   position: absolute;
   inset: 0;
   padding: 32px;
+
+  h1 {
+    -webkit-text-stroke: 1px black;
+    font-size: 60px;
+
+    }
 }
 
 .players {
@@ -14,4 +20,5 @@
   gap: 115px;
   margin-top: 380px;
 
+  
 }

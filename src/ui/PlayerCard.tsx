@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { AddSquare, MinusSquare } from 'iconsax-react'
 import '../styles/PlayerCard.scss'
-import { setPlayerColor } from '../3d/SelectScene'
+import { getPlayerScreenPos, setPlayerColor } from '../3d/SelectScene'
 import { Color3 } from '@babylonjs/core'
 
 const MOUSE_POSES: { [key: string]: { x: number; y: number } } = {
@@ -17,11 +17,11 @@ const MOUSE_POSES: { [key: string]: { x: number; y: number } } = {
   '2-1': { x: 190, y: 200 },
 }
 
-const colors : { [key: string]: Color3 } = {
+const colors: { [key: string]: Color3 } = {
   red: new Color3(1, 0, 0),
   green: new Color3(0, 1, 0),
   blue: new Color3(0, 0, 1),
-  purple: new Color3(.45, 0, .45),
+  purple: new Color3(0.45, 0, 0.45),
 }
 
 type PlayerProps = {
@@ -29,12 +29,14 @@ type PlayerProps = {
   color: string
   connected: boolean
   gamepad?: any
+  index: number
 }
 export default function PlayerCard({
   name: player_name,
   color: player_color,
   connected,
   gamepad,
+  index,
 }: PlayerProps) {
   // Player state
   const [name, setName] = useState(player_name)
@@ -47,6 +49,20 @@ export default function PlayerCard({
   // Card state
   const [shaking, setShaking] = useState(false)
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 })
+
+  const [cardPos, setCardPos] = useState({ top: -1000, left: 0 })
+
+  useEffect(() => {
+    async function getPos() {
+      const pos = (await getPlayerScreenPos(index)) as {
+        top: number
+        left: number
+      }
+      console.log( pos)
+      setCardPos(pos)
+    }
+    getPos()
+  }, [])
 
   useEffect(() => {
     if (shaking) setTimeout(() => setShaking(false), 200)
@@ -172,7 +188,7 @@ export default function PlayerCard({
     setAction('none')
   }
   return (
-    <div className="player">
+    <div className="player" style={{ top: cardPos.top + 50, left: cardPos.left }}>
       <div
         className={`${!connected ? 'waiting' : ''} ${color} ${
           shaking ? 'shaking' : ''
@@ -223,10 +239,10 @@ export default function PlayerCard({
           </div>
         </div>
       </div>
-      <button
-        className={`${ready ? 'ready' : ''}`}
-      >
-        <div><span>X</span> En attente</div>
+      <button className={`${ready ? 'ready' : ''}`}>
+        <div>
+          <span>X</span> En attente
+        </div>
         <div>
           <RunIcon />
           <span>Prêt</span>

@@ -57,7 +57,7 @@ export default function Ui() {
 
   return (
     <div className="Ui">
-      <h1>Choisissez vos abilités</h1>
+      <h1>Choisissez vos habilités</h1>
       <div className="players">
         {state.map((player, index) => (
           <PlayerCard
@@ -66,6 +66,7 @@ export default function Ui() {
             connected={player.connected}
             key={index}
             gamepad={player.gamepad}
+            index={index}
           />
         ))}
       </div>
