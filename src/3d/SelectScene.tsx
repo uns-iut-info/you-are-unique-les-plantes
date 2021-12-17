@@ -30,7 +30,7 @@ let initialised = false
 export const initScene = async (scene: Scene) => {
   _scene = scene
   // scene.clearColor = new Color4(0.5, 0.5, 1)
-  scene.clearColor = new Color4(0, 0, 0, 0.0000000000000001)
+  scene.clearColor = new Color4(0, 0, 0, 0)
 
   canvas = scene.getEngine().getRenderingCanvas()
   if (canvas) {
@@ -93,8 +93,10 @@ export const initScene = async (scene: Scene) => {
     char.rotate(new Vector3(0, 1, 0), Tools.ToRadians(180))
   }
 
-  initialised = true
-  console.log('initialised')
+  scene.executeWhenReady(() => {
+    initialised = true
+    console.log('initialised')
+  })
 }
 
 let playerPoses: any = [null, null, null, null]
@@ -113,8 +115,6 @@ export function getPlayerScreenPos(player: number) {
   return new Promise((res) => {
     update()
     function update() {
-      console.log('update')
-      
       if (!initialised) setTimeout(update, 100)
       else {
         res(
