@@ -53,15 +53,9 @@ export default function PlayerCard({
   const [cardPos, setCardPos] = useState({ top: -1000, left: 0 })
 
   useEffect(() => {
-    async function getPos() {
-      const pos = (await getPlayerScreenPos(index)) as {
-        top: number
-        left: number
-      }
-      console.log( pos)
+    getPlayerScreenPos(index, (pos: { top: number; left: number }) => {
       setCardPos(pos)
-    }
-    getPos()
+    })
   }, [])
 
   useEffect(() => {
@@ -188,7 +182,10 @@ export default function PlayerCard({
     setAction('none')
   }
   return (
-    <div className="player" style={{ top: cardPos.top + 50, left: cardPos.left }}>
+    <div
+      className="player"
+      style={{ top: cardPos.top + 50, left: cardPos.left }}
+    >
       <div
         className={`${!connected ? 'waiting' : ''} ${color} ${
           shaking ? 'shaking' : ''

@@ -94,12 +94,20 @@ export const initScene = async (scene: Scene) => {
   }
 
   scene.executeWhenReady(() => {
-    initialised = true
     console.log('initialised')
+
+    for (const l of listeners) {
+      const screen_pos = getClientRectFromMesh(
+        engine,
+        scene,
+        camera,
+        character_meshes[l.player]
+      )
+      l.callback(screen_pos)
+    }
+    listeners = []
   })
 }
-
-let playerPoses: any = [null, null, null, null]
 
 export const onRender = (scene: Scene) => {}
 
@@ -111,23 +119,19 @@ export function setPlayerColor(player: number, color: Color3) {
   players[player].material = mat
 }
 
-export function getPlayerScreenPos(player: number) {
-  return new Promise((res) => {
-    update()
-    function update() {
-      if (!initialised) setTimeout(update, 100)
-      else {
-        res(
-          getClientRectFromMesh(
-            engine,
-            _scene,
-            camera,
-            character_meshes[player]
-          )
-        )
-      }
-    }
-  })
+let listeners: { player: number, callback: Function, meshPosition?: Vector3 }[] = []
+export function getPlayerScreenPos(player: number, callback: Function) {
+  if(!initialised) {
+    listeners?.push({ player, callback })
+  } else {
+    const screen_pos = getClientRectFromMesh(
+      engine,
+      _scene,
+      camera,
+      character_meshes[player]
+    )
+    callback(screen_pos)
+  }
 }
 
 export default {
