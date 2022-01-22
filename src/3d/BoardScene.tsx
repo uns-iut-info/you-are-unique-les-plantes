@@ -13,15 +13,14 @@ import {
   PBRMaterial,
   Texture,
   HemisphericLight,
-  Material
+  Material,
+  PointerEventTypes,
 } from '@babylonjs/core'
 import '@babylonjs/loaders'
 import { loadObject } from '../utils'
 
-
 // Global data
 const railLength = 20
-
 
 let points: Vector3[] = [
   new Vector3(0 * railLength, 0, 1 * railLength),
@@ -50,6 +49,32 @@ export const initScene = async (scene: Scene) => {
     canvas.height = window.innerHeight
   }
 
+  scene.onPointerObservable.add((pointerInfo) => {
+    switch (pointerInfo.type) {
+      case PointerEventTypes.POINTERDOWN:
+        console.log('POINTER DOWN')
+        break
+      case PointerEventTypes.POINTERUP:
+        console.log('POINTER UP')
+        break
+      case PointerEventTypes.POINTERMOVE:
+        console.log('POINTER MOVE')
+        break
+      case PointerEventTypes.POINTERWHEEL:
+        console.log('POINTER WHEEL')
+        break
+      case PointerEventTypes.POINTERPICK:
+        console.log('POINTER PICK')
+        break
+      case PointerEventTypes.POINTERTAP:
+        console.log('POINTER TAP')
+        break
+      case PointerEventTypes.POINTERDOUBLETAP:
+        console.log('POINTER DOUBLE-TAP')
+        break
+    }
+  })
+
   camera = new ArcRotateCamera(
     'Camera',
     (3 * Math.PI) / 2,
@@ -67,6 +92,14 @@ export const initScene = async (scene: Scene) => {
   MeshBuilder.CreateLines('lines', { points: [points[7], points[0]] }, scene)
 
   const obj = await loadObject('assets/', 'scene.glb', scene)
+  const character_mesh_animations = [...scene.animationGroups]
+  scene.removeAnimationGroup(character_mesh_animations[0])
+  scene.removeAnimationGroup(character_mesh_animations[1])
+
+  const obj32 = await loadObject('assets/', 'scene.glb', scene)
+  const character_2_mesh_animations = [...scene.animationGroups]
+  scene.removeAnimationGroup(character_2_mesh_animations[0])
+  scene.removeAnimationGroup(character_2_mesh_animations[1])
 
   character_mesh = obj[0]
   character_texture_mesh = obj[1]
@@ -82,16 +115,23 @@ export const initScene = async (scene: Scene) => {
   mat1.ambientTexture = new Texture('assets/criminalMaleA.png', scene)
   // character_texture_mesh.overrideMaterialSideOrientation = Material.CounterClockWiseSideOrientation
 
-
   // mat1.diffuseColor = new Color3(0.9, 0, 0)
   character_texture_mesh.material = mat1
   console.log(character_texture_mesh)
 
   // const idle_animation: AnimationGroup | null = scene.getAnimationGroupByName('idle')
-  const run_animation: AnimationGroup | null = scene.getAnimationGroupByName('run')
-  if (run_animation) {
-    run_animation.start(true, 1.0, run_animation.from, run_animation.to, false)
-  }
+  // const run_animation: AnimationGroup | null =
+  //   scene.getAnimationGroupByName('run')
+  // if (run_animation) {
+  //   run_animation.start(true, 1.0, run_animation.from, run_animation.to, false)
+  // }
+  // const player_2_run_animation = scene.animationGroups[3]
+  // player_2_run_animation
+
+  console.log(scene.animationGroups)
+  const anim = character_2_mesh_animations[1]
+  anim.start(true, 1.0, anim.from, anim.to, false)
+
 
   for (let i in points) {
     const index = parseInt(i)
@@ -116,7 +156,12 @@ export const initScene = async (scene: Scene) => {
     material_background.diffuseColor = Color3.Black()
     point.material = material_background
 
-    const text_texture = new DynamicTexture( 'dynamic texture', { width: 256, height: 256 }, scene, false)
+    const text_texture = new DynamicTexture(
+      'dynamic texture',
+      { width: 256, height: 256 },
+      scene,
+      false
+    )
     const material_text = new StandardMaterial('Mat', scene)
     material_text.diffuseTexture = text_texture
     p2.material = material_text
@@ -138,16 +183,16 @@ let nbPoints = points.length
 export const onRender = (scene: Scene) => {
   if (!character_mesh) return
 
-
-
   const current = Math.floor(currentPoint)
   const next = current == nbPoints - 1 ? 0 : current + 1
   const diff = currentPoint - current
   const position = Vector3.Zero()
-  const distance = Math.sqrt(Math.pow(points[current].x - points[next].x, 2) + Math.pow(points[current].z - points[next].z, 2))
+  const distance = Math.sqrt(
+    Math.pow(points[current].x - points[next].x, 2) +
+      Math.pow(points[current].z - points[next].z, 2)
+  )
   const deltaTimeInMillis = scene.getEngine().getDeltaTime()
-  const velocity = speed * deltaTimeInMillis / distance / 30
-  
+  const velocity = (speed * deltaTimeInMillis) / distance / 30
 
   position.x = points[current].x + (points[next].x - points[current].x) * diff
   position.y = points[current].y + (points[next].y - points[current].y) * diff
@@ -184,5 +229,5 @@ export const onRender = (scene: Scene) => {
 
 export default {
   initScene,
-  onRender
+  onRender,
 }
