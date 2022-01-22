@@ -21,6 +21,7 @@ import {
   AbstractMesh,
   Ray,
   RayHelper,
+  Animation,
 } from '@babylonjs/core'
 import '@babylonjs/loaders'
 import { loadObject } from '../utils'
@@ -64,7 +65,7 @@ export const initScene = async (sc: Scene) => {
   }
 
   camera = new ArcRotateCamera('Camera', 0, Math.PI / 2.1, 10, new Vector3(0, 3.3, 0), scene)
-  camera.attachControl(canvas, true)
+  // camera.attachControl(canvas, true)
 
   new HemisphericLight('light', new Vector3(0, 1, 0), scene)
   new HemisphericLight('light', new Vector3(0, -1, 0), scene)
@@ -136,6 +137,8 @@ export const initScene = async (sc: Scene) => {
       }
     }
   })
+
+  startCameraAnimation()
 
   function createGround(
     name: string,
@@ -232,6 +235,74 @@ function isCeiling(mesh: Mesh) {
   const ray = new Ray(raycastFloorPos, Vector3.Up().scale(-1), 0.05)
   const pick = scene.pickWithRay(ray)
   return pick?.hit ? true : false
+}
+
+function startCameraAnimation() {
+  console.log('click')
+
+  const animationcamera = new Animation(
+    'myAnimationcamera',
+    'position',
+    30,
+    Animation.ANIMATIONTYPE_VECTOR3,
+    Animation.ANIMATIONLOOPMODE_CONSTANT
+  )
+
+  const keys = []
+
+  // camera = new ArcRotateCamera('Camera', 0, Math.PI / 2.1, 10, new Vector3(0, 3.3, 0), scene)
+
+
+  keys.push({
+    frame: 0,
+    value: new Vector3(0, 3.3, 0),
+  })
+  keys.push({
+    frame: 11,
+    value: new Vector3(20, 3.3, 0),
+  })
+
+  keys.push({
+    frame: 22,
+    value: new Vector3(0, 3.3, 20),
+  })
+  keys.push({
+    frame: 33,
+    value: new Vector3(-20, 3.3, 20),
+  })
+  keys.push({
+    frame: 44,
+    value: new Vector3(-20, 3.3, 0),
+  })
+
+  keys.push({
+    frame: 55,
+    value: new Vector3(-20, 3.3, -20),
+  })
+  keys.push({
+    frame: 66,
+    value: new Vector3(0, 3.3, -20),
+  })
+  keys.push({
+    frame: 77,
+    value: new Vector3(20, 3.3, 0),
+  })
+  keys.push({
+    frame: 100,
+    value: new Vector3(10, 3.3, 0),
+  })
+  
+
+
+  animationcamera.setKeys(keys)
+
+  camera.animations = []
+  camera.animations.push(animationcamera)
+
+  scene.beginAnimation(camera, 0, 100, false, .3, () => {
+    console.log('ended')
+    
+  })
 }
 
 export default {
