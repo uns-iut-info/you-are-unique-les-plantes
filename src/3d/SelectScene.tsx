@@ -69,7 +69,16 @@ export const initScene = async (scene: Scene) => {
   }
 
   const idle_animation: AnimationGroup | null =
-    scene.getAnimationGroupByName('idle')
+    scene.getAnimationGroupByName('run')
+
+  for (let char of character_meshes) {
+    const anim = scene.getAnimationRatio()
+    console.log(char)
+  }
+
+  console.log(idle_animation?.targetedAnimations)
+  
+
   idle_animation?.start(
     true,
     1.0,

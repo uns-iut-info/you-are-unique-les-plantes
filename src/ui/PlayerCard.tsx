@@ -58,7 +58,6 @@ export default function PlayerCard({
         top: number
         left: number
       }
-      console.log( pos)
       setCardPos(pos)
     }
     getPos()
