@@ -6,3 +6,6 @@ On peut controller un personnage avec zqsd space
 ## Lancer le projet
 - npm i
 - npm start
+
+
+Sacha BYDON  -  Allan DUVOIS
