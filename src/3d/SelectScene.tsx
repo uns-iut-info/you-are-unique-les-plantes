@@ -30,7 +30,7 @@ let initialised = false
 export const initScene = async (scene: Scene) => {
   _scene = scene
   // scene.clearColor = new Color4(0.5, 0.5, 1)
-  scene.clearColor = new Color4(0, 0, 0, 0.0000000000000001)
+  scene.clearColor = new Color4(0, 0, 0, 0)
 
   canvas = scene.getEngine().getRenderingCanvas()
   if (canvas) {
@@ -69,7 +69,16 @@ export const initScene = async (scene: Scene) => {
   }
 
   const idle_animation: AnimationGroup | null =
-    scene.getAnimationGroupByName('idle')
+    scene.getAnimationGroupByName('run')
+
+  for (let char of character_meshes) {
+    const anim = scene.getAnimationRatio()
+    console.log(char)
+  }
+
+  console.log(idle_animation?.targetedAnimations)
+  
+
   idle_animation?.start(
     true,
     1.0,
@@ -93,11 +102,21 @@ export const initScene = async (scene: Scene) => {
     char.rotate(new Vector3(0, 1, 0), Tools.ToRadians(180))
   }
 
-  initialised = true
-  console.log('initialised')
-}
+  scene.executeWhenReady(() => {
+    console.log('initialised')
 
-let playerPoses: any = [null, null, null, null]
+    for (const l of listeners) {
+      const screen_pos = getClientRectFromMesh(
+        engine,
+        scene,
+        camera,
+        character_meshes[l.player]
+      )
+      l.callback(screen_pos)
+    }
+    listeners = []
+  })
+}
 
 export const onRender = (scene: Scene) => {}
 
@@ -109,25 +128,19 @@ export function setPlayerColor(player: number, color: Color3) {
   players[player].material = mat
 }
 
-export function getPlayerScreenPos(player: number) {
-  return new Promise((res) => {
-    update()
-    function update() {
-      console.log('update')
-      
-      if (!initialised) setTimeout(update, 100)
-      else {
-        res(
-          getClientRectFromMesh(
-            engine,
-            _scene,
-            camera,
-            character_meshes[player]
-          )
-        )
-      }
-    }
-  })
+let listeners: { player: number, callback: Function, meshPosition?: Vector3 }[] = []
+export function getPlayerScreenPos(player: number, callback: Function) {
+  if(!initialised) {
+    listeners?.push({ player, callback })
+  } else {
+    const screen_pos = getClientRectFromMesh(
+      engine,
+      _scene,
+      camera,
+      character_meshes[player]
+    )
+    callback(screen_pos)
+  }
 }
 
 export default {
